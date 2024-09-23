@@ -1,48 +1,38 @@
 'use client'
 
-import { Moon, Sun } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-
-import useMounted from '@/hooks/use-mounted'
+import { MoonIcon, SunIcon } from '@radix-ui/react-icons'
 
 export function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
-  const mounted = useMounted()
-  if (!mounted) return null
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant='ghost' size='icon'>
-          {resolvedTheme === 'dark' ? (
-            <Sun className='h-5 w-5 text-orange-300' />
-          ) : (
-            <Moon className='h-5 w-5' />
-          )}
+    <Button
+      size='sm'
+      variant='ghost'
+      onClick={() => {
+        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+      }}
+    >
+      {resolvedTheme === 'dark' ? (
+        <SunIcon className='size-4 text-orange-300' />
+      ) : (
+        <MoonIcon className='size-4 text-sky-950' />
+      )}
 
-          <span className='sr-only'>Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <span className='sr-only'>Toggle theme</span>
+    </Button>
   )
 }
