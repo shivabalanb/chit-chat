@@ -11,30 +11,32 @@ interface FriendRequestsProps {
 
 const FriendRequests = ({
   incomingFriendRequests,
-  // sessionId,
-}: FriendRequestsProps) => {
-  const router = useRouter()
+}: // sessionId,
+FriendRequestsProps) => {
+  const router = useRouter();
   const [friendRequests, setFriendRequests] = useState<IncomingFriendRequest[]>(
     incomingFriendRequests
   );
 
-  const acceptFriend = async (senderId: string) =>{
-    await axios.post('/api/friends/accept',{id: senderId})
+  const acceptFriend = async (senderId: string) => {
+    await axios.post("/api/friends/accept", { id: senderId });
 
-    setFriendRequests(((prev)=> prev.filter((request) => request.senderId !== senderId)))
+    setFriendRequests((prev) =>
+      prev.filter((request) => request.senderId !== senderId)
+    );
 
-    router.refresh()
-  }
+    router.refresh();
+  };
 
-  const denyFriend = async (senderId: string) =>{
-    await axios.post('/api/friends/deny',{id: senderId})
+  const denyFriend = async (senderId: string) => {
+    await axios.post("/api/friends/deny", { id: senderId });
 
-    setFriendRequests(((prev)=> prev.filter((request) => request.senderId !== senderId)))
+    setFriendRequests((prev) =>
+      prev.filter((request) => request.senderId !== senderId)
+    );
 
-    router.refresh()
-  }
-
-  
+    router.refresh();
+  };
 
   return (
     <>
@@ -44,8 +46,18 @@ const FriendRequests = ({
         friendRequests.map((request) => (
           <div key={request.senderId}>
             <p>{request.senderEmail}</p>
-            <button className="btn bg-red-500" onClick={()=>acceptFriend(request.senderId)}>accept</button>
-            <button className="btn  bg-green-500" onClick={()=>denyFriend(request.senderId)}>deny</button>
+            <button
+              className="btn bg-green-500"
+              onClick={() => acceptFriend(request.senderId)}
+            >
+              accept
+            </button>
+            <button
+              className="btn  bg-red-500"
+              onClick={() => denyFriend(request.senderId)}
+            >
+              deny
+            </button>
           </div>
         ))
       )}
