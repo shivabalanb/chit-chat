@@ -1,4 +1,6 @@
+import FriendRequestWidget from "@/app/components/FriendRequestWidget";
 import SignOutButton from "@/app/components/SignOutButton";
+import { fetchRedis } from "@/app/helpers/redis";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
@@ -19,12 +21,18 @@ interface SidebarOption {
 const sidebarOptions: SidebarOption[] = [
   { id: 1, name: "dashboard", href: "/dashboard" },
   { id: 2, name: "add friend", href: "/dashboard/add" },
-  { id: 3, name: "friend requests", href: "/dashboard/requests" },
 ];
 
 export default async function Layout({ children }: LayoutProps) {
   const session = await getServerSession(authOptions);
   if (!session) notFound();
+
+  const unseenRequestCount = (
+    (await fetchRedis(
+      "smembers",
+      `user:${session.user.id}:incoming_friend_requests`
+    )) as string[]
+  ).length;
 
   return (
     <div className="w-full flex h-screen">
@@ -42,6 +50,10 @@ export default async function Layout({ children }: LayoutProps) {
             </Link>
           ))}
         </div>
+        <FriendRequestWidget
+          sessionId={session.user.id}
+          initialUnseenRequestCount={unseenRequestCount}
+        />
         <div className="mt-auto">
           <div className="relative h-8 w-8">
             <Image

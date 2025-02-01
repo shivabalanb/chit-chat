@@ -5,10 +5,7 @@ import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-// interface AddFriendButtonProps {
-//   email: string;
-// }
+import { useState } from "react";
 
 type FormData = z.infer<typeof addFriendValidator>;
 
@@ -21,14 +18,17 @@ const AddFriendButton = () => {
   } = useForm<FormData>({
     resolver: zodResolver(addFriendValidator),
   });
-  const addFriend = async (email: string) => {
+  const [showSuccessState, setShowSuccessState] = useState<boolean>(false);
 
+  const addFriend = async (email: string) => {
     try {
       const validatedEmail = addFriendValidator.parse({ email });
 
       await axios.post("/api/friends/add", {
         email: validatedEmail.email,
       });
+
+      setShowSuccessState(true);
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError("email", { message: error.message });
@@ -52,6 +52,9 @@ const AddFriendButton = () => {
       <input {...register("email")} type="text" id="email" />
       <button>Add</button>
       <p className="text-red-600">{errors.email?.message}</p>
+      {showSuccessState ? (
+        <p className="mt-1 text-sm text-green-600">Friend request sent!</p>
+      ) : null}
     </form>
   );
 };
